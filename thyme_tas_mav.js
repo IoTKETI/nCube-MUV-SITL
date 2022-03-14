@@ -25,6 +25,7 @@ let PORT1 = 14550; // output: SITL --> GCS
 let PORT2 = 14552; // input : GCS --> SITL
 
 global.sitlUDP = null;
+global.sitlUDP2 = null;
 
 exports.ready = function tas_ready() {
     if ((my_drone_type === 'pixhawk') || (my_drone_type === 'ardupilot') || (my_drone_type === 'px4')) {
@@ -66,8 +67,8 @@ exports.noti = function (path_arr, cinObj, socket) {
 };
 
 exports.gcs_noti_handler = function (message) {
-    if (sitlUDP != null) {
-        sitlUDP.send(message, 0, message.length, PORT2, HOST,
+    if (sitlUDP2 != null) {
+        sitlUDP2.send(message, 0, message.length, PORT2, HOST,
             function (err) {
                 if (err) {
                     console.log('UDP message send error', err);
@@ -79,6 +80,7 @@ exports.gcs_noti_handler = function (message) {
 
     }
 };
+sitlUDP2 = dgram.createSocket('udp4');
 
 function mavPortOpening() {
     if (sitlUDP === null) {
