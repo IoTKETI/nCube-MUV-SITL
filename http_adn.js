@@ -153,13 +153,13 @@ exports.udtae = function (target, callback) {
 
 
 exports.delae = function (target, callback) {
-    http_request('Superman', target, 'delete', '', '', function (rsc, res_body) {
+    http_request('Sponde', target, 'delete', '', '', function (rsc, res_body) {
         callback(rsc, res_body);
     });
 };
 
 exports.del_resource = function (target, callback) {
-    http_request('Superman', target, 'delete', '', '', function (rsc, res_body) {
+    http_request('Sponde', target, 'delete', '', '', function (rsc, res_body) {
         callback(rsc, res_body);
     });
 };
@@ -218,7 +218,7 @@ exports.udtct = function(target, lbl, count, callback) {
 
 
 exports.delct = function(target, count, callback) {
-    http_request('Superman', target, 'delete', '', '', function (rsc, res_body) {
+    http_request('Sponde', target, 'delete', '', '', function (rsc, res_body) {
         console.log(count + ' - ' + target + ' - x-m2m-rsc : ' + rsc + ' <----');
         callback(rsc, res_body, count);
     });
@@ -251,7 +251,7 @@ exports.crtsub = function(parent, rn, nu, count, callback) {
 };
 
 exports.delsub = function(target, count, callback) {
-    http_request('Superman', target, 'delete', '', '', function (rsc, res_body) {
+    http_request('Sponde', target, 'delete', '', '', function (rsc, res_body) {
         console.log(count + ' - ' + target + ' - x-m2m-rsc : ' + rsc + ' <----');
         console.log(res_body);
         callback(rsc, res_body, count);
