@@ -287,7 +287,7 @@ function parseMavFromDrone(mavPacket) {
             }
         }
     } catch (e) {
-        console.log('[parseMavFromDrone Error]', e);
+        console.log('[parseMavFromDrone Error]\n', mavPacket, '\n', e);
     }
 }
 
