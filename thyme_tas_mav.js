@@ -21,8 +21,8 @@ var mavlink = require('./mavlibrary/mavlink.js');
 var {mavlink20, MAVLink20Processor} = require('./mavlibrary/mavlink20.js');
 
 let HOST = '127.0.0.1';
-let PORT1 = 14550; // output: SITL --> GCS
-let PORT2 = 14552; // input : GCS --> SITL
+let PORT1 = 14555; // output: SITL --> GCS
+let PORT2 = 14556; // input : GCS --> SITL
 
 global.sitlUDP = null;
 global.sitlUDP2 = null;

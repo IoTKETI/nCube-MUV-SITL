@@ -150,6 +150,8 @@ function ready_for_notification() {
             }
         }
         mqtt_connect(conf.cse.host, muv_sub_gcs_topic, noti_topic);
+
+        muv_mqtt_connect('localhost', 1883, muv_sub_msw_topic, muv_sub_gcs_topic);
     }
 }
 
@@ -503,15 +505,10 @@ function mqtt_connect(serverip, sub_gcs_topic, noti_topic) {
                     console.log('[mqtt_connect] noti_topic is subscribed:  ' + noti_topic);
                 });
             }
-            if (req_rc_topic !== '') {
-                mqtt_client.publish(req_rc_topic, drone_info.drone, function (){
-                    console.log('[mqtt_connect] send my_drone_name to nCube-RC [' + my_rc_name + '] :  ' + drone_info.drone);
-                });
-            }
         });
 
         mqtt_client.on('message', function (topic, message) {
-            if (topic == sub_gcs_topic) {
+            if (topic === sub_gcs_topic) {
                 tas_mav.gcs_noti_handler(message);
             } else {
                 // if (topic.includes('/oneM2M/req/')) {
@@ -529,6 +526,80 @@ function mqtt_connect(serverip, sub_gcs_topic, noti_topic) {
 
         mqtt_client.on('error', function (err) {
             console.log('[mqtt_client error] ' + err.message);
+        });
+    }
+}
+
+function muv_mqtt_connect(broker_ip, port, noti_topic, sub_gcs_topic) {
+    if (muv_mqtt_client == null) {
+        if (conf.usesecure === 'disable') {
+            var connectOptions = {
+                host: broker_ip,
+                port: port,
+//              username: 'keti',
+//              password: 'keti123',
+                protocol: "mqtt",
+                keepalive: 10,
+//              clientId: serverUID,
+                protocolId: "MQTT",
+                protocolVersion: 4,
+                clean: true,
+                reconnectPeriod: 2000,
+                connectTimeout: 2000,
+                rejectUnauthorized: false
+            };
+        } else {
+            connectOptions = {
+                host: broker_ip,
+                port: port,
+                protocol: "mqtts",
+                keepalive: 10,
+//              clientId: serverUID,
+                protocolId: "MQTT",
+                protocolVersion: 4,
+                clean: true,
+                reconnectPeriod: 2000,
+                connectTimeout: 2000,
+                key: fs.readFileSync("./server-key.pem"),
+                cert: fs.readFileSync("./server-crt.pem"),
+                rejectUnauthorized: false
+            };
+        }
+
+        muv_mqtt_client = mqtt.connect(connectOptions);
+
+        muv_mqtt_client.on('connect', function () {
+            console.log('muv_mqtt connected to ' + broker_ip);
+            if (sub_gcs_topic != '') {
+                muv_mqtt_client.subscribe(sub_gcs_topic, function () {
+                    console.log('[muv_mqtt_connect] sub_gcs_topic is subscribed: ' + sub_gcs_topic);
+                });
+            }
+
+            for (var idx in noti_topic) {
+                if (noti_topic.hasOwnProperty(idx)) {
+                    muv_mqtt_client.subscribe(noti_topic[idx]);
+                    console.log('[muv_mqtt_connect] noti_topic[' + idx + ']: ' + noti_topic[idx]);
+                }
+            }
+        });
+
+        muv_mqtt_client.on('message', function (topic, message) {
+            try {
+                if (topic === sub_gcs_topic) {
+                    tas_mav.gcs_noti_handler(message);
+                } else {
+                    var msg_obj = JSON.parse(message.toString());
+                    //console.log(topic + ' - ' + JSON.stringify(msg_obj));
+                }
+            } catch (e) {
+                msg_obj = message.toString();
+                //console.log(topic + ' - ' + msg_obj);
+            }
+        });
+
+        muv_mqtt_client.on('error', function (err) {
+            console.log('[muv_mqtt_client error] ' + err.message);
         });
     }
 }
